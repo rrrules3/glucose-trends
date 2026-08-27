@@ -1,6 +1,6 @@
 # Glucose Trends
 
-An Android and iOS app for reviewing Dexcom G7 history: a glucose chart over
+An Android app for reviewing Dexcom G7 history: a glucose chart over
 any timeframe, the **minimum and maximum** for that timeframe (with the time
 each occurred), time-in-range, variability, and a daily-pattern overlay.
 
@@ -19,15 +19,13 @@ the sensor directly, so this app uses the two supported routes:
 | Source | Setup | Freshness | History |
 | --- | --- | --- | --- |
 | **Health Connect** (Android) | Grant one permission | ~3 h delay | Whatever Dexcom has written |
-| **Dexcom API v3** | Register a free developer app | ~3 h delay on a public developer account | Configurable, 30 days to everything available |
 | **Clarity CSV export** | None — just export and import | Manual | Whatever you export |
 | **Demo data** | None | n/a | 90 days of synthetic readings |
 
 All real sources merge into one timeline keyed by timestamp, so importing an
 old export alongside a live sync widens your history rather than replacing it.
 
-**Health Connect is the route most people should use.** It needs nothing from
-Dexcom — no developer account, no client secret, no partnership approval — only
+**Health Connect is the main route.** It needs nothing from Dexcom — no developer account, no client secret, no partnership approval — only
 the user's permission on the device. The Dexcom app writes glucose into Health
 Connect (turn it on under Connections), and this app reads it. Two permissions
 are requested, both read-only: `READ_BLOOD_GLUCOSE`, and
@@ -127,136 +125,6 @@ checked to confirm `PrivacyInfo.xcprivacy` is actually copied into
 `Runner.app/`, `MinimumOSVersion` is 14.0, and no stray `CFBundleURLTypes`
 entry was added.
 
-## Connecting your Dexcom account
-
-Dexcom issues client credentials per *application*, not per user, so the app
-cannot ship one — you register your own:
-
-1. Sign up at [developer.dexcom.com](https://developer.dexcom.com) and create an
-   app.
-2. Set its redirect URI to **`http://localhost:8423/callback`**.
-
-   Dexcom's portal rejects custom schemes — it accepts only `http://` or
-   `https://` — so the app uses the loopback redirect RFC 8252 defines for
-   native apps: it listens on `127.0.0.1:8423` for the few seconds the login
-   takes, opens Dexcom's page in the system browser, and catches the
-   authorization code when the browser is redirected back. The code never
-   leaves the device.
-
-   The port is part of the registered URI and matched exactly, so it is fixed
-   in `DexcomAuth.defaultRedirectUri`. Change it there and in the portal
-   together, or login fails with a redirect mismatch.
-3. In the app: **Settings → Dexcom account**, paste the client ID and secret,
-   pick an environment, and tap **Connect**.
-
-**Sandbox** works immediately and needs no password: the Dexcom login page
-shows a drop-down of simulated accounts — including *Sandbox User - G7* — and
-you pick one. Use it to exercise the whole OAuth round-trip before you point at
-real data. **Production** returns your own readings, delayed roughly three hours
-on a standard developer account. Real-time access requires a separate
-partnership agreement with Dexcom.
-
-The OAuth endpoints are `/v3/oauth2/login` and `/v3/oauth2/token`, and the data
-endpoints are `/v3/users/self/egvs` and `/v3/users/self/dataRange`. Older
-write-ups still show `/v2/oauth2/...`; those are superseded, and
-[`test/dexcom_endpoints_test.dart`](test/dexcom_endpoints_test.dart) pins the
-correct paths so a regression fails the suite rather than surfacing as a broken
-login.
-
-Tokens are stored via `flutter_secure_storage` — the Android keystore, and the
-iOS Keychain marked device-only and non-syncing — never in plain shared
-preferences.
-
-### Read this before distributing the app to anyone else
-
-The current build is a **single-user, device-only design**: you supply your own
-client ID and secret, and the tokens live on your phone. That is fine for
-running the app on your own device against your own Dexcom account. It does
-**not** scale to other users, for two reasons.
-
-**1. Dexcom requires server-side tokens.** From their authentication docs:
-
-> "An application's client_secret should never be shared or distributed."
->
-> "Dexcom requires that partners store tokens (e.g., client secret, access
-> tokens) on their servers. Integrations with mobile applications should not
-> store tokens on the mobile device."
-
-Dexcom's OAuth has no PKCE or public-client flow, so `client_secret` is
-mandatory at token exchange. There is no way for a shipped mobile binary to
-hold it safely — anything embedded in an APK or IPA can be extracted. Storing
-it in the Keychain/keystore protects it from other apps on the device, but it
-does not satisfy the requirement above.
-
-**2. Production access is gated.** Registering gets you Sandbox immediately.
-Real data needs an upgrade request reviewed by Dexcom's Strategic Partnerships
-team:
-
-| Tier | For | Users | Process |
-| --- | --- | --- | --- |
-| Sandbox | Anyone, immediately | simulated only | just register |
-| Limited Access | Individuals, prototypes | **up to 5** | upgrade request, reviewed |
-| Full Access | Commercial release | unlimited | questionnaire + technical review |
-
-**What this means in practice**
-
-- *Just you* — works today, no changes.
-- *You and up to four others* — apply for Limited Access, and add a backend that
-  holds the secret and does the token exchange. The app then talks to your
-  server instead of Dexcom directly.
-- *Public release on either store* — Full Access plus that backend, and the
-  Data Licensing Agreement.
-
-The backend is the real work: an OAuth callback handler, encrypted token
-storage per user, refresh handling, and a thin API the app calls. The Dart side
-changes less than you would expect — `DexcomAuth` and `DexcomApiClient` are
-already isolated behind `GlucoseRepository`, so pointing them at your own
-server is a swap at that seam rather than a rewrite. The CSV import path needs
-none of this and keeps working offline regardless.
-
-### Why the OAuth flow looks unusual
-
-Dexcom's API is built for server-side web apps, and it pushes back on a
-standalone mobile client in two ways:
-
-- **Redirect URIs must be `http://` or `https://`.** Custom schemes such as
-  `myapp://callback` are rejected by the portal, which rules out the usual
-  mobile pattern of `flutter_web_auth_2` plus an intent-filter. Hence the
-  loopback listener in
-  [`loopback_redirect_server.dart`](lib/data/sources/loopback_redirect_server.dart).
-- **Tokens are supposed to live on your server**, as quoted above.
-
-Both point the same way: for anything beyond personal use, Dexcom expects a
-backend. The loopback flow is a legitimate, standards-based fit for a
-single-user app, but it is not what Dexcom designed for.
-
-## Combining old history with ongoing readings
-
-The common case — someone who wants to analyse months of past data *and* keep
-seeing new readings — needs both sources, because neither covers it alone:
-
-- **Health Connect only goes forward.** Sharing does not backfill, so it starts
-  from the day it is switched on.
-- **A Clarity export only goes backward.** It is a snapshot of what existed
-  when it was generated.
-
-They compose, because the repository merges everything into one timeline keyed
-by timestamp. The order that avoids a gap:
-
-1. **Turn on Health Connect sharing in the Dexcom app first.** The forward feed
-   starts from this moment, so do it before anything else.
-2. **Then export from Clarity**, covering as far back as wanted and up to
-   today, and import it. Because step 1 already happened, the export overlaps
-   the start of the live feed rather than leaving a hole between them.
-3. **After that, just open the app** (or pull to refresh) to pull new readings.
-
-Re-importing later is safe: readings merge by timestamp, so overlapping exports
-widen the history and never duplicate.
-
-Doing it the other way round — exporting first, enabling sharing afterwards —
-leaves a gap covering however long passed in between, and nothing backfills it.
-A second export closes the gap if it happens.
-
 ## Giving the app to someone else
 
 The CSV route needs no Dexcom developer account, no backend, no approval, and
@@ -311,8 +179,9 @@ without touching real data.
 - **Credentials gitignored**: `key.properties`, `*.jks`, `*.keystore`.
   [`android/key.properties.example`](android/key.properties.example) shows the
   shape.
-- **Internet permission**, plus the `<queries>` entry url_launcher needs to
-  find a browser under Android 11+ package visibility.
+- **No internet permission.** The app makes no network calls at all — Health
+  Connect and CSV import are both local — so there is nothing to declare and
+  nothing to justify.
 
 R8 shrinking is deliberately **off** — see the comment in the build file.
 
@@ -396,23 +265,24 @@ exempt. For handing an app to one person, that whole path is unnecessary.
 
 ### What has actually been verified
 
-Both platforms have been built and run, not just compiled:
+Run on real hardware, not just compiled:
 
-- **Android**: `flutter build appbundle --release` produces
-  `app-release.aab` (43.6 MB — the bundle carries debug symbols in
-  `BUNDLE-METADATA` that Play strips before delivery, so the download is far
-  smaller). The release APK was installed on an API 36 arm64 emulator, launched
-  with no crash, and a Clarity CSV was imported through Android's real document
-  picker: 2,016 readings parsed and charted.
-- **iOS**: both targets build, and the app was driven on an iPhone 17
-  simulator.
-- 64 unit tests cover the shared Dart layer.
+- **A Galaxy S23 (Android 16)** — the full Health Connect path end to end:
+  permission request, both grants, query, unit conversion, merge, storage,
+  chart. Proven with real records written by Samsung Health, which confirmed the
+  mmol/L conversion against live data rather than only against tests.
+- **An API 36 arm64 emulator** — CSV import through Android's real document
+  picker, the empty-result and permission-declined paths, gap handling against
+  CSVs with deliberate 3-day and 5-hour outages, and the pinned tooltip.
+- **iOS** builds for both simulator and device and was driven on an iPhone 17
+  simulator, though it is not currently maintained.
+- 101 unit tests cover the shared Dart layer.
 
-Still unexercised on both platforms: the OAuth round-trip against a real Dexcom
-account, since that needs credentials. The endpoints are pinned by
-[`test/dexcom_endpoints_test.dart`](test/dexcom_endpoints_test.dart), but the
-handshake itself has never run. Dexcom's passwordless sandbox is the cheapest
-way to close that gap.
+**Still unexercised:** whether the Dexcom G7 app actually writes glucose into
+Health Connect. Dexcom documents this for the G6 and is silent on G7, and
+confirming it needs a real sensor. Everything on this side of that boundary is
+verified. If G7 turns out not to populate Health Connect, the failure is benign:
+the user sees the app's "no glucose found" guidance and CSV import still works.
 
 #### Toolchain notes
 
@@ -439,10 +309,10 @@ on another machine:
 2. ~~**App icon and screenshots.**~~ Done — see
    [Icon and store assets](#icon-and-store-assets).
 3. **Privacy policy URL** — required, and doubly so for a health app.
-4. **Data safety form.** Nothing leaves the device, so this is short — but the
-   form is mandatory and Play cross-checks it against app behaviour. Declare
-   the Clarity CSV and Dexcom sync as health data *collected and stored on
-   device only*, not shared.
+4. **Data safety form.** Nothing leaves the device — the app has no network
+   permission — so this is short, but the form is mandatory and Play
+   cross-checks it against app behaviour. Declare glucose as health data
+   *collected and stored on device only*, not shared.
 5. **Health apps declaration.** Play asks about health functionality during
    setup. Answer factually: this displays a user's own CGM history and makes no
    diagnosis or treatment recommendation. The disclaimer in Settings → About
@@ -561,6 +431,25 @@ adb shell wm size reset && adb shell wm density reset
 Play needs at least two screenshots; four or more at 1080p makes the listing
 eligible for larger promotional placements.
 
+## Why there is no Dexcom API integration
+
+There was one, and it worked — full OAuth against Dexcom's sandbox, verified
+end to end. It was removed anyway.
+
+Dexcom's API has no PKCE or public-client flow, so `client_secret` is mandatory
+at token exchange, and their docs say it must never be distributed and that
+tokens belong on a server. A standalone mobile app cannot satisfy that: the
+secret would either sit in an extractable APK or have to be registered by each
+user individually. Production access is also gated behind a partnership review
+capped at five users. So the feature could only ever have been a developer
+curiosity, sitting in Settings inviting people to tap something that would not
+work for them.
+
+Removing it took the app to **two permissions and no network access at all** —
+Health Connect and a CSV file are both local. For a health app that is worth
+more than an integration nobody could use. The code is in the first commit if
+it is ever needed.
+
 ## Why there is no background sync
 
 It was built, measured, and removed. `workmanager` takes the app's permission
@@ -583,10 +472,10 @@ tree-shake it away and the task silently never runs.
 [`PRIVACY.md`](PRIVACY.md) is a draft policy describing the app as actually
 built. Its claims were checked against the code rather than assumed:
 
-- The only network destinations in `lib/` are `api.dexcom.com` and
-  `sandbox-api.dexcom.com`.
-- The shipped release APK requests exactly one permission, `INTERNET`
-  (`apkanalyzer manifest permissions <apk>`).
+- There are **no** network calls anywhere in `lib/`, and the shipped APK
+  declares no `INTERNET` permission — verified with
+  `apkanalyzer manifest permissions <apk>`.
+- The only two permissions are Health Connect reads.
 - There is no analytics, crash-reporting, advertising, or tracking dependency
   in `pubspec.yaml`.
 
@@ -598,7 +487,7 @@ If you add any of those, or a backend, the policy has to change with them.
 lib/
   models/       glucose readings, trends, timeframes, statistics
   data/
-    sources/    Dexcom OAuth, Dexcom API v3 client, Clarity CSV, demo generator
+    sources/    Health Connect, Clarity CSV, demo generator
     reading_store.dart      delta-encoded local cache
     glucose_repository.dart merges sources into one timeline
   state/        user settings

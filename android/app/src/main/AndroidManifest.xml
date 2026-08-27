@@ -1,7 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Required to reach api.dexcom.com / sandbox-api.dexcom.com. -->
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <!-- Read glucose the Dexcom app has written to Health Connect. Read-only:
          this app never writes to a user's health record. -->
     <uses-permission android:name="android.permission.health.READ_BLOOD_GLUCOSE" />
@@ -64,13 +61,6 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
-        </intent>
-        <!-- Lets url_launcher find a browser for the Dexcom OAuth login.
-             Without this, Android 11+ package visibility hides every browser
-             and the launch silently fails. -->
-        <intent>
-            <action android:name="android.intent.action.VIEW"/>
-            <data android:scheme="https"/>
         </intent>
         <!-- Detect whether Health Connect is present, and show its permission
              rationale screen. -->

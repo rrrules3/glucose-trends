@@ -1,15 +1,11 @@
 import 'package:glucose_trends/data/glucose_repository.dart';
 import 'package:glucose_trends/data/reading_store.dart';
-import 'package:glucose_trends/data/sources/dexcom_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<GlucoseRepository> makeRepo() async {
   SharedPreferences.setMockInitialValues({});
-  return GlucoseRepository(
-    store: await ReadingStore.open(),
-    auth: DexcomAuth(),
-  );
+  return GlucoseRepository(store: await ReadingStore.open());
 }
 
 const _csvHeader =
@@ -98,28 +94,19 @@ void main() {
   test('imported history survives a restart', () async {
     SharedPreferences.setMockInitialValues({});
     final store = await ReadingStore.open();
-    final repo = GlucoseRepository(store: store, auth: DexcomAuth());
+    final repo = GlucoseRepository(store: store);
     await repo.importCsv('${_csvHeader}2024-05-01T08:00:00,EGV,100\n');
 
-    final reopened = GlucoseRepository(
-      store: await ReadingStore.open(),
-      auth: DexcomAuth(),
-    );
+    final reopened = GlucoseRepository(store: await ReadingStore.open());
     expect(reopened.readings, hasLength(1));
   });
 
   test('remembers which source the cached readings came from', () async {
     SharedPreferences.setMockInitialValues({});
-    final repo = GlucoseRepository(
-      store: await ReadingStore.open(),
-      auth: DexcomAuth(),
-    );
+    final repo = GlucoseRepository(store: await ReadingStore.open());
     await repo.loadDemoData();
 
-    final reopened = GlucoseRepository(
-      store: await ReadingStore.open(),
-      auth: DexcomAuth(),
-    );
+    final reopened = GlucoseRepository(store: await ReadingStore.open());
     expect(reopened.sourceKind, DataSourceKind.demo);
   });
 
@@ -130,14 +117,6 @@ void main() {
 
     expect(repo.hasData, isFalse);
     expect((await ReadingStore.open()).load(), isEmpty);
-  });
-
-  test('syncing without a connected account reports an error', () async {
-    final repo = await makeRepo();
-    await repo.syncFromDexcom();
-
-    expect(repo.error, contains('Connect your Dexcom account'));
-    expect(repo.isLoading, isFalse);
   });
 
   test('a failed import surfaces an error and leaves history intact', () async {

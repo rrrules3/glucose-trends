@@ -10,24 +10,19 @@
 ## The short version
 
 Glucose Trends shows you your own Dexcom CGM history. Your glucose data stays
-on your phone. It is never sent to us — we do not operate a server, and we have
-no way to see your data. There is no analytics, no advertising, and no tracking
-of any kind in this app.
+on your phone, and the app has **no internet access at all** — it holds no
+network permission, so it cannot send your data anywhere even in principle.
+There is no analytics, no advertising, and no tracking of any kind.
 
 ## What the app handles
 
 **Glucose readings.** Estimated glucose values, their timestamps, and their
-trend arrows. These reach the app one of three ways: read from Android's Health
-Connect after you grant permission, downloaded from your Dexcom account if you
-connect one, or read from a Dexcom Clarity CSV file you choose to import. This
-is health data, and it is treated as sensitive.
+trend arrows. These reach the app one of two ways: read from Android's Health
+Connect after you grant permission, or read from a Dexcom Clarity CSV file you
+choose to import. This is health data, and it is treated as sensitive.
 
 **Your settings.** Preferred units (mmol/L or mg/dL), your target glucose range,
 and the last timeframe you viewed.
-
-**Dexcom credentials.** If you connect a Dexcom account, the app stores the
-developer client ID and secret you entered, plus the OAuth access and refresh
-tokens Dexcom issues.
 
 ## Health Connect (Android)
 
@@ -54,33 +49,21 @@ readings**.
 Everything is stored **on your device only**, in storage private to this app
 that other apps cannot read.
 
-Glucose readings and settings are kept in the app's private preferences.
-Dexcom credentials and OAuth tokens are kept in the platform's secure
-credential store — the Android Keystore, or the iOS Keychain. On iOS those
-items are additionally marked device-only and non-synchronising, so restoring a
-backup onto a different phone does not carry your Dexcom session with it.
+Glucose readings and settings are kept in the app's private storage, which
+other apps cannot read. Nothing is backed up to any cloud service of ours,
+because there isn't one — and the app could not reach it if there were.
 
-The app does not back your glucose history up to any cloud service of ours,
-because there isn't one.
+## What leaves your device
 
-## What leaves your device, and what does not
+Nothing.
 
-The app makes network connections to exactly two addresses, both operated by
-Dexcom:
+The app declares no internet permission. Android will not let it open a network
+connection, so your readings cannot be transmitted anywhere — not to us, not to
+anyone. This is checkable: the permission list below is the complete set the app
+requests, and none of them grant network access.
 
-- `https://api.dexcom.com`
-- `https://sandbox-api.dexcom.com`
-
-Those connections happen only if you choose to connect a Dexcom account, and
-they exist solely to log you in and download your own readings. Data travels
-between your phone and Dexcom directly; it does not pass through us. Dexcom's
-handling of that data is governed by Dexcom's own privacy policy and by the
-authorisation you grant when you log in. You can revoke that authorisation at
-any time from your Dexcom account settings, and the app will stop being able to
-sync.
-
-If you only import Clarity CSV files, the app makes no network connections at
-all and works entirely offline.
+Both ways data reaches the app are local to your phone. Health Connect is an
+Android system service on the device. A Clarity CSV is a file you already have.
 
 **We do not collect, receive, transmit, sell, or share your data with anyone.**
 The app contains no analytics, no crash reporting, no advertising, and no
@@ -88,14 +71,15 @@ third-party tracking libraries.
 
 ## Permissions
 
-On Android the app requests three permissions:
+On Android the app requests two permissions, both read-only and both for
+Health Connect:
 
-- **Internet** — used only for the Dexcom API connections described above.
-- **Read blood glucose** and **Read health data history** — Health Connect
-  access, described above, and only after you grant them. The second exists
-  because Health Connect otherwise returns only the last 30 days.
+- **Read blood glucose** — to read the readings your Dexcom app has shared.
+- **Read health data history** — Health Connect otherwise returns only the last
+  30 days, and the app's longer timeframes need more than that.
 
-The app schedules no background work and posts no notifications.
+That is the entire list. No internet, no location, no storage, no camera, no
+contacts. The app schedules no background work and posts no notifications.
 
 Importing a CSV uses your system's file picker, which hands the app the one file
 you select. The app does not request broad access to your files, photos,
@@ -112,8 +96,9 @@ You can delete everything the app stores in two ways:
 - **Uninstalling the app**, which removes the history, your settings, and the
   stored Dexcom credentials and tokens.
 
-Deleting data from this app does not delete anything from your Dexcom account.
-To do that, or to request deletion of data Dexcom holds, contact Dexcom.
+Deleting data from this app does not delete anything from Health Connect or
+from your Dexcom account. Health Connect data is managed in Android Settings;
+for data Dexcom holds, contact Dexcom.
 
 ## Children
 

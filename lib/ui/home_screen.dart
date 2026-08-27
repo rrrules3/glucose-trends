@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.refresh_rounded),
               tooltip: 'Sync from Dexcom',
               onPressed: () =>
-                  repo.syncFromDexcom(initialWindow: settings.syncHistoryWindow),
+                  repo.syncFromHealthConnect(window: settings.syncHistoryWindow),
             ),
           IconButton(
             icon: const Icon(Icons.settings_rounded),
@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            repo.syncFromDexcom(initialWindow: settings.syncHistoryWindow),
+            repo.syncFromHealthConnect(window: settings.syncHistoryWindow),
         child: ListView(
           // Flutter draws edge-to-edge on modern Android, so the list runs
           // under the gesture/navigation bar. Without the system inset the
@@ -274,8 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 /// Shown when there is nothing to chart yet.
 ///
-/// Importing a Clarity export is the primary action: it is the only route that
-/// needs no Dexcom developer credentials, so it must not be buried in Settings.
+/// Getting data in is the whole job at this point, so both routes are offered
+/// directly rather than buried in Settings.
 class _EmptyStateActions extends StatelessWidget {
   const _EmptyStateActions({required this.repo});
 

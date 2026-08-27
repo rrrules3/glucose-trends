@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/glucose_repository.dart';
-import '../data/sources/dexcom_auth.dart';
 import '../state/settings_controller.dart';
 import '../util/formatting.dart';
 import '../util/units.dart';
 import 'csv_import_action.dart';
-import 'dexcom_setup_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -15,7 +13,6 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsController>();
-    final auth = context.watch<DexcomAuth>();
     final repo = context.watch<GlucoseRepository>();
     final theme = Theme.of(context);
     final unit = settings.unit;
@@ -76,14 +73,38 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.favorite_rounded),
               title: const Text('Sync from Health Connect'),
-              subtitle: const Text(
-                'Reads glucose the Dexcom app has shared to Health Connect. '
-                'No Dexcom developer account needed.',
+              subtitle: Text(
+                repo.lastSync == null
+                    ? 'Reads glucose the Dexcom app has shared to Health '
+                        'Connect.'
+                    : 'Last synced ${formatRelative(repo.lastSync!)}',
               ),
               enabled: !repo.isLoading,
               onTap: () =>
                   repo.syncFromHealthConnect(
                       window: settings.syncHistoryWindow),
+            ),
+            ListTile(
+              leading: const Icon(Icons.date_range_rounded),
+              title: const Text('History to sync'),
+              trailing: DropdownButton<int?>(
+                value: settings.syncHistoryDays,
+                onChanged: (v) => settings.setSyncHistoryDays(v),
+                items: [
+                  for (final days in SettingsController.syncHistoryOptions)
+                    DropdownMenuItem(
+                        value: days, child: Text(_syncLabel(days))),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(72, 0, 16, 12),
+              child: Text(
+                'How far back a full sync reaches. Health Connect serves only '
+                'the last 30 days unless you granted history access.',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(72, 0, 16, 12),
@@ -99,84 +120,6 @@ class SettingsScreen extends StatelessWidget {
             ),
             const Divider(height: 32),
           ],
-
-          _SectionHeader('Dexcom account'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(
-              'Advanced. Syncing directly from Dexcom\u2019s API requires your '
-              'own developer app registered at developer.dexcom.com — most '
-              'people should use Health Connect or a Clarity export instead.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              auth.isConnected
-                  ? Icons.cloud_done_rounded
-                  : Icons.cloud_off_rounded,
-              color: auth.isConnected ? Colors.green : theme.colorScheme.outline,
-            ),
-            title: Text(auth.isConnected ? 'Connected' : 'Not connected'),
-            subtitle: Text(
-              auth.credentials == null
-                  ? 'Add your developer app credentials to sync readings.'
-                  : auth.credentials!.environment.label,
-            ),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const DexcomSetupScreen()),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.sync_rounded),
-            title: const Text('Sync now'),
-            subtitle: Text(
-              repo.lastSync == null
-                  ? 'Never synced'
-                  : 'Last synced ${formatRelative(repo.lastSync!)}',
-            ),
-            enabled: auth.isConnected && !repo.isLoading,
-            onTap: () =>
-                repo.syncFromDexcom(initialWindow: settings.syncHistoryWindow),
-          ),
-          ListTile(
-            leading: const Icon(Icons.date_range_rounded),
-            title: const Text('History to sync'),
-            // The explanation goes full-width below rather than in the
-            // subtitle, which the dropdown squeezes into a narrow column.
-            trailing: DropdownButton<int?>(
-              value: settings.syncHistoryDays,
-              onChanged: (v) => settings.setSyncHistoryDays(v),
-              items: [
-                for (final days in SettingsController.syncHistoryOptions)
-                  DropdownMenuItem(value: days, child: Text(_syncLabel(days))),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(72, 0, 16, 12),
-            child: Text(
-              'Applies to both Health Connect and the Dexcom API. Dexcom caps '
-              'each request at 30 days, so a longer window is more requests '
-              'and a slower first sync — not a hard limit.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.history_rounded),
-            title: const Text('Re-download full history'),
-            subtitle: Text('Fetches ${_syncLabel(settings.syncHistoryDays)
-                .toLowerCase()} again'),
-            enabled: auth.isConnected && !repo.isLoading,
-            onTap: () => repo.syncFromDexcom(
-              fullHistory: true,
-              initialWindow: settings.syncHistoryWindow,
-            ),
-          ),
-          const Divider(height: 32),
 
           _SectionHeader('Import & data'),
           ListTile(

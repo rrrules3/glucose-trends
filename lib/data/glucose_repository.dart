@@ -4,15 +4,12 @@ import '../models/glucose_reading.dart';
 import 'reading_store.dart';
 import 'sources/clarity_csv_importer.dart';
 import 'sources/demo_data.dart';
-import 'sources/dexcom_api_client.dart';
-import 'sources/dexcom_auth.dart';
 import 'sources/health_connect_source.dart';
 
 /// Where the currently-loaded readings came from.
 enum DataSourceKind {
   none('No data'),
   demo('Demo data'),
-  dexcomApi('Dexcom API'),
   healthConnect('Health Connect'),
   csv('Clarity CSV');
 
@@ -28,12 +25,8 @@ enum DataSourceKind {
 class GlucoseRepository extends ChangeNotifier {
   GlucoseRepository({
     required ReadingStore store,
-    required DexcomAuth auth,
-    DexcomApiClient? apiClient,
     HealthConnectSource? healthConnect,
   })  : _store = store,
-        _auth = auth,
-        _api = apiClient ?? DexcomApiClient(auth),
         _healthConnect = healthConnect ?? HealthConnectSource() {
     _readings = _store.load();
     if (_readings.isNotEmpty) {
@@ -45,8 +38,6 @@ class GlucoseRepository extends ChangeNotifier {
   }
 
   final ReadingStore _store;
-  final DexcomAuth _auth;
-  final DexcomApiClient _api;
   final HealthConnectSource _healthConnect;
 
   HealthConnectSource get healthConnect => _healthConnect;
@@ -92,75 +83,6 @@ class GlucoseRepository extends ChangeNotifier {
       }
     }
     return lo;
-  }
-
-  /// Pull new readings from the Dexcom API.
-  ///
-  /// By default this fetches only what is missing since the newest cached
-  /// reading; [fullHistory] re-fetches from the start of [initialWindow].
-  ///
-  /// A null [initialWindow] means "everything Dexcom still holds", bounded by
-  /// what the `dataRange` endpoint reports. Dexcom caps a single request at 30
-  /// days, so a long window simply becomes more requests — see
-  /// [chunkDateRange].
-  Future<void> syncFromDexcom({
-    bool fullHistory = false,
-    Duration? initialWindow = const Duration(days: 90),
-  }) async {
-    if (!_auth.isConnected) {
-      _fail('Connect your Dexcom account in Settings first.');
-      return;
-    }
-
-    _begin();
-    try {
-      final range = await _api.dataRange();
-      final now = DateTime.now();
-      final end = range.end ?? now;
-
-      DateTime start;
-      if (fullHistory || _readings.isEmpty) {
-        if (initialWindow == null) {
-          // Everything available; fall back to a year if Dexcom does not say.
-          start = range.start ?? now.subtract(const Duration(days: 365));
-        } else {
-          final earliest = now.subtract(initialWindow);
-          start = range.start != null && range.start!.isAfter(earliest)
-              ? range.start!
-              : earliest;
-        }
-      } else {
-        // Overlap by an hour so a partially-written final chunk gets corrected.
-        start = _readings.last.time.subtract(const Duration(hours: 1));
-      }
-
-      if (!start.isBefore(end)) {
-        _progress = 1;
-        await _store.setLastSync(now);
-        _finish(DataSourceKind.dexcomApi);
-        return;
-      }
-
-      final fetched = await _api.fetchEgvs(
-        start: start,
-        end: end,
-        onProgress: (p) {
-          _progress = p;
-          notifyListeners();
-        },
-      );
-
-      _merge(fetched);
-      await _store.save(_readings);
-      await _store.setLastSync(now);
-      _finish(DataSourceKind.dexcomApi);
-    } on DexcomApiException catch (e) {
-      _fail(e.message);
-    } on DexcomAuthException catch (e) {
-      _fail(e.message);
-    } catch (e) {
-      _fail('Sync failed: $e');
-    }
   }
 
   /// Pull glucose the Dexcom app has written to Health Connect.
