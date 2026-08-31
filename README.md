@@ -343,7 +343,7 @@ What is already configured in this repo:
 What you still have to do:
 
 1. **Apple Developer Program membership** ($99/year) and a real bundle
-   identifier. The bundle ID is `com.rohanrajesh.glucosetrends`; set signing in
+   identifier. The bundle ID is `com.rohanrajesh.glucosechart`; set signing in
    Xcode under Signing & Capabilities and enable automatic signing.
 2. ~~**App icon.**~~ Done — see [Icon and store assets](#icon-and-store-assets).
 3. **Privacy policy URL.** Required for every app on the store. A draft is in
@@ -360,7 +360,7 @@ What you still have to do:
 **The name.** The project was originally "Dexcomm" — one letter from "Dexcom",
 which invites rejection under the guideline on implying an association with
 another company, and is a trademark risk regardless of Apple. It has been
-renamed: both bundle identifiers are `com.rohanrajesh.glucosetrends` and the
+renamed: both bundle identifiers are `com.rohanrajesh.glucosechart` and the
 display name is "Glucose Trends" on both platforms. Nothing user-facing says
 "Dexcom" except factual descriptions of where the data comes from — keep it
 that way in your store listing. **The bundle ID is permanent once submitted.**

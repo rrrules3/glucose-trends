@@ -1,7 +1,7 @@
 # Privacy Policy — Glucose Trends
 
-**Effective date:** August 25, 2026
-**Published by:** Rohan Rajesh
+**Effective date:** August 25, 2026  
+**Published by:** Rohan Rajesh  
 **Contact:** rohan.rajesh1205@gmail.com
 
 > This policy describes the app as built. If you change what it does — add a

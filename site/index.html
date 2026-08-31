@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Glucose Trends</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 44rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem;
+    color: #1a1c1e; background: #fff;
+  }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 1rem; }
+  h2 { font-size: 1.2rem; margin: 2.25rem 0 .6rem; }
+  p, li { margin: 0 0 .85rem; }
+  ul { padding-left: 1.25rem; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .875em; background: #f1f2f4; padding: .1em .35em; border-radius: 4px;
+  }
+  blockquote {
+    margin: 1.25rem 0; padding: .75rem 1rem; border-left: 3px solid #c8ccd2;
+    background: #f7f8fa; color: #44484e;
+  }
+  blockquote p { margin: 0; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e3e5e8; background: #16181a; }
+    code { background: #26292d; }
+    blockquote { background: #1e2124; border-left-color: #3a3f45; color: #b6bac0; }
+  }
+</style>
+</head>
+<body>
+<h1>Privacy Policy — Glucose Trends</h1>
+<p><strong>Effective date:</strong> August 25, 2026<br><strong>Published by:</strong> Rohan Rajesh<br><strong>Contact:</strong> rohan.rajesh1205@gmail.com</p>
+<blockquote>
+<p>This policy describes the app as built. If you change what it does — add a</p>
+<p>backend, analytics, or any network access — change this document too.</p>
+</blockquote>
+<h2>The short version</h2>
+<p>Glucose Trends shows you your own Dexcom CGM history. Your glucose data stays on your phone, and the app has <strong>no internet access at all</strong> — it holds no network permission, so it cannot send your data anywhere even in principle. There is no analytics, no advertising, and no tracking of any kind.</p>
+<h2>What the app handles</h2>
+<p><strong>Glucose readings.</strong> Estimated glucose values, their timestamps, and their trend arrows. These reach the app one of two ways: read from Android&#x27;s Health Connect after you grant permission, or read from a Dexcom Clarity CSV file you choose to import. This is health data, and it is treated as sensitive. <strong>Your settings.</strong> Preferred units (mmol/L or mg/dL), your target glucose range, and the last timeframe you viewed.</p>
+<h2>Health Connect (Android)</h2>
+<p>If you grant it, the app reads <strong>blood glucose</strong> from Health Connect — the readings your Dexcom app has shared there. It requests two permissions:</p>
+<ul>
+<li><code>READ_BLOOD_GLUCOSE</code> — to read those readings.</li>
+<li><code>READ_HEALTH_DATA_HISTORY</code> — Health Connect otherwise returns only the last</li>
+</ul>
+<p>30 days, and the app&#x27;s longer timeframes need more than that. <strong>The app only ever reads.</strong> It holds no write permission and cannot add, change, or delete anything in your health record. It requests no other Health Connect data type. Data read from Health Connect is used solely to draw your charts and statistics inside the app. It is stored on your device as described below, and is never transmitted anywhere, shared with third parties, or used for advertising. You can revoke access at any time in Settings → Security &amp; privacy → Health Connect, and clear what the app has cached with **Settings → Clear stored readings**.</p>
+<h2>Where it is stored</h2>
+<p>Everything is stored <strong>on your device only</strong>, in storage private to this app that other apps cannot read. Glucose readings and settings are kept in the app&#x27;s private storage, which other apps cannot read. Nothing is backed up to any cloud service of ours, because there isn&#x27;t one — and the app could not reach it if there were.</p>
+<h2>What leaves your device</h2>
+<p>Nothing. The app declares no internet permission. Android will not let it open a network connection, so your readings cannot be transmitted anywhere — not to us, not to anyone. This is checkable: the permission list below is the complete set the app requests, and none of them grant network access. Both ways data reaches the app are local to your phone. Health Connect is an Android system service on the device. A Clarity CSV is a file you already have. <strong>We do not collect, receive, transmit, sell, or share your data with anyone.</strong> The app contains no analytics, no crash reporting, no advertising, and no third-party tracking libraries.</p>
+<h2>Permissions</h2>
+<p>On Android the app requests two permissions, both read-only and both for Health Connect:</p>
+<ul>
+<li><strong>Read blood glucose</strong> — to read the readings your Dexcom app has shared.</li>
+<li><strong>Read health data history</strong> — Health Connect otherwise returns only the last</li>
+</ul>
+<p>30 days, and the app&#x27;s longer timeframes need more than that. That is the entire list. No internet, no location, no storage, no camera, no contacts. The app schedules no background work and posts no notifications. Importing a CSV uses your system&#x27;s file picker, which hands the app the one file you select. The app does not request broad access to your files, photos, location, camera, microphone, contacts, or any other sensitive permission.</p>
+<h2>Keeping and deleting your data</h2>
+<p>Your data stays on your device until you remove it. There is no retention period on our side because we hold nothing. You can delete everything the app stores in two ways:</p>
+<ul>
+<li><strong>Settings → Clear stored readings</strong>, which removes the local glucose history.</li>
+<li><strong>Uninstalling the app</strong>, which removes the history, your settings, and the</li>
+</ul>
+<p>stored Dexcom credentials and tokens. Deleting data from this app does not delete anything from Health Connect or from your Dexcom account. Health Connect data is managed in Android Settings; for data Dexcom holds, contact Dexcom.</p>
+<h2>Children</h2>
+<p>The app is not directed at children and does not knowingly handle data from anyone under 13. It has no accounts, no profiles, and no social features.</p>
+<h2>Not a medical device</h2>
+<p>Glucose Trends is an informational tool for reviewing your own historical CGM data. It is not a medical device, it is not intended for diagnosis or treatment, and it must not be used to make treatment decisions. Always confirm with the Dexcom app or a fingerstick, and follow your healthcare professional&#x27;s advice.</p>
+<h2>Your rights</h2>
+<p>Because your data never leaves your device, requests to access, correct, export, or delete it are things you carry out yourself, using the controls above. If you have questions about this policy, contact rohan.rajesh1205@gmail.com. Depending on where you live, you may have rights under laws such as the GDPR or the CCPA. Those rights generally apply to data a company holds about you; we hold none.</p>
+<h2>Changes</h2>
+<p>If this policy changes, the updated version will be posted at this URL and the effective date above will be revised. Material changes will also be noted in the app&#x27;s release notes.</p>
+<h2>Trademarks</h2>
+<p>Dexcom, Dexcom G7, and Dexcom Clarity are trademarks of DexCom, Inc. This app is an independent project. It is not made, endorsed, sponsored, or supported by DexCom, Inc.</p>
+</body>
+</html>
