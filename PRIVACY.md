@@ -4,8 +4,8 @@
 **Published by:** Rohan Rajesh
 **Contact:** rohan.rajesh1205@gmail.com
 
-> **Fill in the four fields above before publishing.** This policy describes the
-> app as built; if you change what it does, change this document too.
+> This policy describes the app as built. If you change what it does — add a
+> backend, analytics, or any network access — change this document too.
 
 ## The short version
 
