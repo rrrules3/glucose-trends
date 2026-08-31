@@ -1,4 +1,4 @@
-package com.rohanrajesh.glucosechart
+package com.rohanrajesh.glucosetrends
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

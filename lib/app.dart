@@ -30,7 +30,7 @@ class GlucoseTrendsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Glucose Chart',
+      title: 'Glucose Trends',
       debugShowCheckedModeBanner: false,
       theme: _theme(Brightness.light),
       darkTheme: _theme(Brightness.dark),
