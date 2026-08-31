@@ -64,10 +64,11 @@ android {
                 signingConfigs.getByName("debug")
             }
             // R8 shrinking is deliberately left off. It can strip
-            // reflection-reached plugin code and produce crashes that only
-            // appear in release builds, and there is no Android toolchain on
-            // this machine to verify against. Turn it on once you can build
-            // and actually run a release AAB on a device.
+            // reflection-reached plugin code and produce crashes that surface
+            // only in release, and nothing here has been tested with it on.
+            // If you enable it, install the resulting release build on a real
+            // device and exercise Health Connect and CSV import before
+            // shipping — those are the paths most likely to break.
         }
     }
 }
