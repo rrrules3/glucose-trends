@@ -20,7 +20,7 @@ plugins {
 }
 
 android {
-    namespace = "com.glucosetrends.app"
+    namespace = "com.rohanrajesh.glucosechart"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -34,7 +34,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.glucosetrends.app"
+        applicationId = "com.rohanrajesh.glucosechart"
         // Raised for the health plugin, which needs API 26 for Health Connect.
         // That is Android 8.0 (2017), so the coverage cost is negligible;
         // flutter_secure_storage's own floor of 23 is already below it.

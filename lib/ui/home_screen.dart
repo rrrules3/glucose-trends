@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Glucose Trends'),
+        title: const Text('Glucose Chart'),
         actions: [
           if (repo.isLoading)
             const Padding(

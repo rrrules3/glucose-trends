@@ -1,4 +1,4 @@
-# Privacy Policy — Glucose Trends
+# Privacy Policy — Glucose Chart
 
 **Effective date:** August 25, 2026
 **Published by:** Rohan Rajesh
@@ -9,7 +9,7 @@
 
 ## The short version
 
-Glucose Trends shows you your own Dexcom CGM history. Your glucose data stays
+Glucose Chart shows you your own Dexcom CGM history. Your glucose data stays
 on your phone, and the app has **no internet access at all** — it holds no
 network permission, so it cannot send your data anywhere even in principle.
 There is no analytics, no advertising, and no tracking of any kind.
@@ -107,7 +107,7 @@ anyone under 13. It has no accounts, no profiles, and no social features.
 
 ## Not a medical device
 
-Glucose Trends is an informational tool for reviewing your own historical CGM
+Glucose Chart is an informational tool for reviewing your own historical CGM
 data. It is not a medical device, it is not intended for diagnosis or treatment,
 and it must not be used to make treatment decisions. Always confirm with the
 Dexcom app or a fingerstick, and follow your healthcare professional's advice.

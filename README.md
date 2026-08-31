@@ -1,4 +1,4 @@
-# Glucose Trends
+# Glucose Chart
 
 An Android app for reviewing Dexcom G7 history: a glucose chart over
 any timeframe, the **minimum and maximum** for that timeframe (with the time
@@ -343,8 +343,8 @@ What is already configured in this repo:
 What you still have to do:
 
 1. **Apple Developer Program membership** ($99/year) and a real bundle
-   identifier. `com.glucosetrends.app` is a placeholder — set your own in Xcode
-   under Signing & Capabilities, and enable automatic signing.
+   identifier. The bundle ID is `com.rohanrajesh.glucosechart`; set signing in
+   Xcode under Signing & Capabilities and enable automatic signing.
 2. ~~**App icon.**~~ Done — see [Icon and store assets](#icon-and-store-assets).
 3. **Privacy policy URL.** Required for every app on the store. A draft is in
    [`PRIVACY.md`](PRIVACY.md) — fill in the four bracketed fields and host it
@@ -360,13 +360,13 @@ What you still have to do:
 **The name.** The project was originally "Dexcomm" — one letter from "Dexcom",
 which invites rejection under the guideline on implying an association with
 another company, and is a trademark risk regardless of Apple. It has been
-renamed: the Dart package is `glucose_trends`, both bundle identifiers are
-`com.glucosetrends.app`, and the display name is "Glucose Trends" on both
-platforms. Nothing user-facing says "Dexcom" except factual descriptions of
-where the data comes from — keep it that way in your store listing, and swap
-`com.glucosetrends.app` for a reverse-DNS identifier on a domain you actually
-own before you create the App Store Connect record. **The bundle ID is
-permanent once submitted.**
+renamed: both bundle identifiers are `com.rohanrajesh.glucosechart` and the
+display name is "Glucose Chart" on both platforms. Nothing user-facing says
+"Dexcom" except factual descriptions of where the data comes from — keep it
+that way in your store listing. **The bundle ID is permanent once submitted.**
+
+The Dart package is still `glucose_trends`. That name is internal, never
+user-visible, and renaming it would touch every test import for no benefit.
 
 **Medical-app scrutiny.** Guideline 1.4.1 says apps that could provide
 inaccurate medical data get evaluated more carefully, and reviewers may ask who

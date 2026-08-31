@@ -139,7 +139,7 @@ def feature_graphic() -> Image.Image:
     else:  # pragma: no cover - only if no system font is present
         title = sub = ImageFont.load_default()
 
-    d.text((W * 0.06, H * 0.30), "Glucose Trends", font=title, fill=(255, 255, 255))
+    d.text((W * 0.06, H * 0.30), "Glucose Chart", font=title, fill=(255, 255, 255))
     d.text((W * 0.065, H * 0.52), "Your CGM history, at a glance",
            font=sub, fill=(220, 232, 255))
 
