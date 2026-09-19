@@ -1,11 +1,23 @@
 # Glucose Trends
 
-An Android app for reviewing Dexcom G7 history: a glucose chart over
-any timeframe, the **minimum and maximum** for that timeframe (with the time
-each occurred), time-in-range, variability, and a daily-pattern overlay.
+An Android app for reviewing Dexcom G7 history: a glucose chart over any
+timeframe, the **minimum and maximum** for that timeframe (with the time each
+occurred), time-in-range, variability, and a daily-pattern overlay.
 
-Built with Flutter — one codebase, both stores. Verified on Flutter 3.41.6 /
-Dart 3.11.4. Minimum versions: Android 6.0 (API 23), iOS 14.
+<p align="center">
+  <img src="screenshots/01-dashboard.png" width="270" alt="Glucose chart with the highest and lowest reading for the selected timeframe">
+  &nbsp;&nbsp;
+  <img src="screenshots/02-patterns.png" width="270" alt="Time in range and the daily pattern chart">
+</p>
+
+Built with Flutter. Android is the maintained target; the iOS build works but is
+not currently kept up. Verified on Flutter 3.41.6 / Dart 3.11.4. Minimum
+versions: **Android 8.0 (API 26)** — required by the Health Connect plugin — and
+iOS 14.
+
+**Two permissions, both read-only, and no network access at all.** The app
+declares no `INTERNET` permission, so glucose data cannot leave the device even
+in principle.
 
 > Not a medical device. Do not use it to make treatment decisions — confirm with
 > the Dexcom app or a fingerstick.
@@ -513,3 +525,7 @@ flutter test
 53 tests covering the statistics engine (including the min/max reporting),
 CSV parsing, Dexcom API response parsing, the downsampler's extreme
 preservation, cache encoding, and repository merge/window behaviour.
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).
